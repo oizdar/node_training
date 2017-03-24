@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const app = require('../app/user_app')
+    , debug = require('debug')('intern2-node-register-radek:server')
+    , http = require('http')
+    , async = require('async')
+
+    , MongoDb = require('../lib/mongo_db')
+    , mongoDb = new MongoDb({connectionUri: process.env.MONGODB_URI, modelDir: `../models`})
+
+    , port = parseInt(process.env.PORT || '3000', 10)
+    , server = http.createServer(app)
+    ;
+
+app.set('port', port);
+
+// req.app.get('db') - @ routes
+app.set('db', mongoDb);
+
+async.waterfall([
+    // INIT MONGODB CONNECTION
+    (next) => {
+        mongoDb.init((err) => {
+            if (err) {
+                console.error(`MongoDb initialization error: ${err.message}`);
+                return next(err);
+            }
+
+            next(null);
+        });
+    },
+
+    // INIT HTTP SERVER
+    (next) => {
+        server.listen(port);
+
+        server.once('error', (err) => {
+            if (err) {
+                console.error(`Http server initialization error: ${err.message}`);
+                return next(err);
+            }
+
+            next(null);
+        });
+
+        server.once('listening', next);
+    }
+
+], (err) => {
+    if (err) {
+        process.exit(1);
+    }
+
+    console.log(`USER_API http server initialized - listening @ :${port}`);
+});
