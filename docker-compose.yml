@@ -7,7 +7,7 @@ rabbit:
         - "5672:5672"
         - "15672:15672"
     environment:
-        VIRTUAL_HOST: rabbit.docker
+        VIRTUAL_HOST: node.rabbit.docker
         VIRTUAL_PORT: 15673
 
         RABBITMQ_DEFAULT_USER: admin
@@ -15,5 +15,19 @@ rabbit:
         RABBITMQ_DEFAULT_VHOST: /
 
         # Get rid of it when we'll separate it from consul
-        SERVICE_5672_NAME: rabbit
+        SERVICE_5672_NAME: node-rabbit
+    restart: unless-stopped
+
+mongo:
+    image: mongo:3.2.4
+    ports:
+        - "27017:27017"
+    command:
+        --smallfiles
+    environment:
+        VIRTUAL_HOST: node.mongo.docker
+        VIRTUAL_PORT: 27017
+
+        # Get rid of it when we'll separate it from consul
+        SERVICE_27017_NAME: node-mongo
     restart: unless-stopped
