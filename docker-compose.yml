@@ -1,0 +1,19 @@
+rabbit:
+    image: rabbitmq:3-management
+    working_dir: /var/www
+    restart: unless-stopped
+    hostname: rabbit
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    environment:
+        VIRTUAL_HOST: rabbit.docker
+        VIRTUAL_PORT: 15673
+
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: admin
+        RABBITMQ_DEFAULT_VHOST: /
+
+        # Get rid of it when we'll separate it from consul
+        SERVICE_5672_NAME: rabbit
+    restart: unless-stopped
